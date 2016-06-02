@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
 import com.erbene.popularmovies.models.Movie;
 import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
@@ -24,7 +26,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.ViewHolder> {
+public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.ViewHolder>{
     private final String BASE_IMG_PATH = "http://image.tmdb.org/t/p/w185";
     public List<Movie> mMovieList;
     Context mContext;
@@ -38,7 +40,6 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_list_item, parent, false);
-        // set the view's size, margins, paddings and layout parameters
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }
@@ -46,9 +47,14 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Movie mMovie = mMovieList.get(position);
-
         Picasso.with(mContext).load(BASE_IMG_PATH + mMovie.getPosterPath())
                 .into(holder.mPosterView);
+        holder.mPosterView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("OnClickListener","Clicked on movie: " + mMovie.getOriginalTitle());
+            }
+        });
     }
 
     @Override

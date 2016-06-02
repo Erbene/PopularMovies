@@ -1,5 +1,9 @@
 package com.erbene.popularmovies.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.util.Log;
+
 import org.json.JSONObject;
 
 import java.util.List;
@@ -7,7 +11,7 @@ import java.util.List;
 /**
  * Created by Maia on 5/30/2016.
  */
-public class Movie {
+public class Movie implements Parcelable {
     String mPosterPath;
     boolean mAdult;
     String mOverview;
@@ -31,6 +35,7 @@ public class Movie {
  */
     public Movie(JSONObject json){
         try {
+            Log.i("Movie","Movie created: "+json.getString("original_title") );
             setOriginalTitle(json.getString("original_title"));
             setPosterPath(json.getString("poster_path"));
             setOverview(json.getString("overview"));
@@ -40,6 +45,37 @@ public class Movie {
 
         }
     }
+
+    public Movie(Parcel pc) {
+        setOriginalTitle(pc.readString());
+        setPosterPath(pc.readString());
+        setOverview(pc.readString());
+        setReleaseDate(pc.readString());
+        setVoteAverage(pc.readDouble());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(getOriginalTitle());
+        dest.writeString(getPosterPath());
+        dest.writeString(getOverview());
+        dest.writeString(getReleaseDate());
+        dest.writeDouble(getVoteAverage());
+    }
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+        public Movie createFromParcel(Parcel pc) {
+            return new Movie(pc);
+        }
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

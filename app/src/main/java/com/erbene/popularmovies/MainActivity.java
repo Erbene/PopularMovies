@@ -10,7 +10,5 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        MovieListFragment forecastFragment =  ((MovieListFragment)getSupportFragmentManager()
-//                .findFragmentById(R.id.fragment_movie_list));
     }
 }
