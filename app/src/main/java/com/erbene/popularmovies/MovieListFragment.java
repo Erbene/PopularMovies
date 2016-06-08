@@ -4,13 +4,17 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class MovieListFragment extends Fragment {
+import com.erbene.popularmovies.models.Movie;
+
+public class MovieListFragment extends Fragment implements MovieListAdapter.Callbacks {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -36,7 +40,7 @@ public class MovieListFragment extends Fragment {
         mLayoutManager = new GridLayoutManager(getContext(),2);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new MovieListAdapter(getContext());
+        mAdapter = new MovieListAdapter(getContext(),this);
         mRecyclerView.setAdapter(mAdapter);
 
         return mView;
@@ -65,5 +69,16 @@ public class MovieListFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    @Override
+    public void onClick(Movie movie) {
+        Log.i("MovieList","OnClickEvent");
+        Bundle parcel = new Bundle();
+        parcel.putParcelable("movie",movie);
+        MovieDetailFragment details = new MovieDetailFragment();
+        details.setArguments(parcel);
+        getFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .add(R.id.fragment_movie_list, details).addToBackStack(null).commit();
     }
 }

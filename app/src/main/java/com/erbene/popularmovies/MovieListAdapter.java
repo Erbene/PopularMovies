@@ -1,9 +1,13 @@
 package com.erbene.popularmovies;
 
 
+import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,7 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
+
 import com.erbene.popularmovies.models.Movie;
 import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
@@ -31,8 +35,11 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
     public List<Movie> mMovieList;
     Context mContext;
     GetMoviesTask mTask;
-    public MovieListAdapter(Context context){
+    Callbacks mCallbackReceiver;
+
+    public MovieListAdapter(Context context, Callbacks cb){
         mContext = context;
+        mCallbackReceiver = cb;
         mMovieList = new ArrayList<>();
         mTask = new GetMoviesTask();
         mTask.execute("");
@@ -46,13 +53,15 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final Movie mMovie = mMovieList.get(position);
-        Picasso.with(mContext).load(BASE_IMG_PATH + mMovie.getPosterPath())
+        Movie temp = mMovieList.get(position);
+        temp.setPosterPath(BASE_IMG_PATH + temp.getPosterPath());
+        final Movie mMovie = temp;
+        Picasso.with(mContext).load(mMovie.getPosterPath())
                 .into(holder.mPosterView);
         holder.mPosterView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("OnClickListener","Clicked on movie: " + mMovie.getOriginalTitle());
+                mCallbackReceiver.onClick(mMovie);
             }
         });
     }
@@ -156,5 +165,8 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
             }
             return movieList;
         }
+    }
+    public interface Callbacks {
+        public void onClick(Movie movie);
     }
 }
