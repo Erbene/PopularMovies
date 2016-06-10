@@ -11,13 +11,15 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
+import android.content.Context;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
 
 import com.erbene.popularmovies.models.Movie;
 import com.squareup.picasso.Picasso;
@@ -98,6 +100,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
             mPosterView = (ImageView) v.findViewById(R.id.movie_poster);
         }
     }
+
     public void resetAdapter(){
         mMovieList.clear();
         GetMoviesTask mTask = new GetMoviesTask();
@@ -108,7 +111,6 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
         private final String LOG_TAG = "GetMoviesTask";
         private final String BY_POPULARITY = "http://api.themoviedb.org/3/movie/popular";
         private final String BY_TOP_RATED = "http://api.themoviedb.org/3/movie/top_rated";
-
 
         @Override
         protected void onPostExecute(List<Movie> movies) {
@@ -135,7 +137,6 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
                 } else {
                     base_url = BY_POPULARITY;
                 }
-
                 Uri builtUri = Uri.parse(base_url).buildUpon()
                         .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_KEY)
                         .build();
