@@ -1,8 +1,11 @@
 package com.erbene.popularmovies;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.GridLayoutManager;
@@ -16,8 +19,10 @@ import com.erbene.popularmovies.models.Movie;
 
 public class MovieListFragment extends Fragment implements MovieListAdapter.Callbacks {
 
+    private final String TAG = "MovieListFragment";
+
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private MovieListAdapter mAdapter;
     private GridLayoutManager mLayoutManager;
 
     public MovieListFragment() {
@@ -34,9 +39,6 @@ public class MovieListFragment extends Fragment implements MovieListAdapter.Call
         View mView = inflater.inflate(R.layout.fragment_list, container, false);
         mRecyclerView = (RecyclerView) mView.findViewById(R.id.my_recycler_view);
 
-        // improve performance since imgs shouldnt resize.
-        mRecyclerView.setHasFixedSize(true);
-
         mLayoutManager = new GridLayoutManager(getContext(),2);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
@@ -44,6 +46,18 @@ public class MovieListFragment extends Fragment implements MovieListAdapter.Call
         mRecyclerView.setAdapter(mAdapter);
 
         return mView;
+    }
+
+
+    @Override
+    public void onResume() {
+        Log.i(TAG,"OnResume");
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
     }
 
     @Override
@@ -54,21 +68,6 @@ public class MovieListFragment extends Fragment implements MovieListAdapter.Call
     @Override
     public void onDetach() {
         super.onDetach();
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 
     @Override

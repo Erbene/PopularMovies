@@ -5,9 +5,12 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,19 +33,36 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.ViewHolder>{
+public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.ViewHolder> {
+
+    private final String TAG = "MovieListAdapter";
+
     private final String BASE_IMG_PATH = "http://image.tmdb.org/t/p/w185";
+
     public List<Movie> mMovieList;
     Context mContext;
-    GetMoviesTask mTask;
     Callbacks mCallbackReceiver;
+    private SharedPreferences.OnSharedPreferenceChangeListener mPreferenceListener;
+
 
     public MovieListAdapter(Context context, Callbacks cb){
         mContext = context;
         mCallbackReceiver = cb;
         mMovieList = new ArrayList<>();
-        mTask = new GetMoviesTask();
-        mTask.execute("");
+        GetMoviesTask mTask = new GetMoviesTask();
+        //listener on changed sort order preference:
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+
+        mPreferenceListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+                if(key.equals(SettingsActivity.KEY_ORDER_BY)){
+                    resetAdapter();
+                }
+            }
+        };
+        prefs.registerOnSharedPreferenceChangeListener(mPreferenceListener);
+
+        mTask.execute();
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -56,7 +76,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
         Movie temp = mMovieList.get(position);
         temp.setPosterPath(BASE_IMG_PATH + temp.getPosterPath());
         final Movie mMovie = temp;
-        Picasso.with(mContext).load(mMovie.getPosterPath())
+        Picasso.with(mContext).load(mMovie.getPosterPath()).placeholder(R.drawable.placeholder)
                 .into(holder.mPosterView);
         holder.mPosterView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,12 +98,17 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
             mPosterView = (ImageView) v.findViewById(R.id.movie_poster);
         }
     }
-
-
-    public class GetMoviesTask extends AsyncTask<String,Void, List<Movie>> {
+    public void resetAdapter(){
+        mMovieList.clear();
+        GetMoviesTask mTask = new GetMoviesTask();
+        mTask.execute();
+        notifyDataSetChanged();
+    }
+    public class GetMoviesTask extends AsyncTask<Void,Void, List<Movie>> {
         private final String LOG_TAG = "GetMoviesTask";
         private final String BY_POPULARITY = "http://api.themoviedb.org/3/movie/popular";
-        private final String BY_TOP_RATER = "http://api.themoviedb.org/3/movie/top_rated";
+        private final String BY_TOP_RATED = "http://api.themoviedb.org/3/movie/top_rated";
+
 
         @Override
         protected void onPostExecute(List<Movie> movies) {
@@ -93,7 +118,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
         }
 
         @Override
-        protected List<Movie> doInBackground(String... params) {
+        protected List<Movie> doInBackground(Void... params) {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             List<Movie> movies = null;
@@ -101,15 +126,16 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 
             try {
                 String base_url = null;
-                switch(params[0]){
-                    case "top_rated":
-                        base_url = BY_TOP_RATER;
-                        break;
-
-                    case "popularity":
-                    default:
-                        base_url = BY_POPULARITY;
+                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mContext);
+                String mPrefOrder = sharedPref.getString(SettingsActivity.KEY_ORDER_BY, "");
+                if(mPrefOrder.equals(mContext.getResources().getString(R.string.pref_order_top_rated))){
+                    base_url = BY_TOP_RATED;
+                } else if (mPrefOrder.equals(mContext.getResources().getString(R.string.pref_order_popularity))){
+                    base_url = BY_POPULARITY;
+                } else {
+                    base_url = BY_POPULARITY;
                 }
+
                 Uri builtUri = Uri.parse(base_url).buildUpon()
                         .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_KEY)
                         .build();
