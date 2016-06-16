@@ -1,7 +1,9 @@
 package com.erbene.popularmovies;
 
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.preference.PreferenceManager;
+
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -33,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
                 break;
+            default:
+                return super.onOptionsItemSelected(item);
         }
         return true;
     }
