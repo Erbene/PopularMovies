@@ -1,6 +1,8 @@
 package com.erbene.popularmovies;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -11,7 +13,7 @@ import android.util.Log;
 /**
  * Created by Maia on 6/8/2016.
  */
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends Activity {
 
     private final static String TAG = "SettingsActivity";
     public final static String KEY_ORDER_BY = "pref_order_key";
@@ -24,7 +26,6 @@ public class SettingsActivity extends PreferenceActivity {
         Log.d(TAG, "onCreate");
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new OrderFragment()).commit();
-
     }
 
 

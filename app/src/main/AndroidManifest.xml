@@ -18,7 +18,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".SettingsActivity"
-            android:screenOrientation="portrait" />
+            />
+        <provider
+            android:authorities="com.erbene.popularmovies.data.MovieProvider"
+            android:name="com.erbene.popularmovies.data.generated.MovieProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>

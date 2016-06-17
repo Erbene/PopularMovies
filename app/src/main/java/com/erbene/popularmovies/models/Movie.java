@@ -1,8 +1,12 @@
 package com.erbene.popularmovies.models;
 
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.style.TtsSpan;
 import android.util.Log;
+
+import com.erbene.popularmovies.data.MovieColumns;
 
 import org.json.JSONObject;
 
@@ -26,6 +30,7 @@ public class Movie implements Parcelable {
     Integer mVoteCount;
     boolean mVideo;
     Double mVoteAverage;
+    boolean mFavorite;
 /*    For the moment, will only set requested parameters.
     original title
     movie poster image thumbnail
@@ -36,6 +41,7 @@ public class Movie implements Parcelable {
     public Movie(JSONObject json){
         try {
             Log.i("Movie","Movie created: "+json.getString("original_title") );
+            setId(json.getLong("id"));
             setOriginalTitle(json.getString("original_title"));
             setPosterPath(json.getString("poster_path"));
             setOverview(json.getString("overview"));
@@ -45,7 +51,19 @@ public class Movie implements Parcelable {
 
         }
     }
+    public Movie(Cursor cursor, boolean favorite){
+        try {
+            setId(new Long(cursor.getInt(cursor.getColumnIndex(MovieColumns._ID))));
+            setOriginalTitle(cursor.getString(cursor.getColumnIndex(MovieColumns.ORIGINAL_TITLE)));
+            setPosterPath(cursor.getString(cursor.getColumnIndex(MovieColumns.POSTER_PATH)));
+            setOverview(cursor.getString(cursor.getColumnIndex(MovieColumns.OVERVIEW)));
+            setVoteAverage(cursor.getDouble(cursor.getColumnIndex(MovieColumns.VOTE_AVERAGE)));
+            mFavorite = favorite;
+            setReleaseDate(cursor.getString(cursor.getColumnIndex(MovieColumns.RELEASE_DATE)));
+        } catch(Exception e){
 
+        }
+    }
     public Movie(Parcel pc) {
         setOriginalTitle(pc.readString());
         setPosterPath(pc.readString());
@@ -202,5 +220,12 @@ public class Movie implements Parcelable {
 
     public void setVoteAverage(Double mVoteAverage) {
         this.mVoteAverage = mVoteAverage;
+    }
+    public boolean isFavorite() {
+        return mFavorite;
+    }
+
+    public void setFavorite(boolean mFavorite) {
+        this.mFavorite = mFavorite;
     }
 }

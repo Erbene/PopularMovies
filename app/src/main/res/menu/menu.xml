@@ -5,4 +5,8 @@
         android:icon="@drawable/settings_white_filled_icon"
         android:title="@string/settings"
         popularmovies:showAsAction="ifRoom"/>
+    <item android:id="@+id/favorites"
+        android:icon="@drawable/favorite_star_white"
+        android:title="@string/favorites"
+        popularmovies:showAsAction="ifRoom"/>
 </menu>
