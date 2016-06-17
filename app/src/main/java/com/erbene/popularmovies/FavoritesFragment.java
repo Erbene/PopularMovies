@@ -50,6 +50,7 @@ public class FavoritesFragment extends Fragment implements LoaderManager.LoaderC
     private TextView mEmptyFavorites;
     private FavoriteListAdapter mAdapter;
     private GridLayoutManager mLayoutManager;
+    private boolean mTwoPane = false;
 
     public FavoritesFragment() {
 

@@ -12,6 +12,9 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    private boolean mTwoPane;
+    public static final String MOVIEDETAILFRAGMENT_TAG = "MDFTAG";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,6 +22,18 @@ public class MainActivity extends AppCompatActivity {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         setContentView(R.layout.activity_main);
+        MovieListFragment mlf = (MovieListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_movie_list);
+        if (findViewById(R.id.movie_detail_container) != null) {
+            mTwoPane = true;
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.movie_detail_container, new MovieDetailFragment(), MOVIEDETAILFRAGMENT_TAG)
+                        .commit();
+            }
+        } else {
+            mTwoPane = false;
+        }
+        mlf.setTwoPaneLayout(mTwoPane);
     }
 
     @Override

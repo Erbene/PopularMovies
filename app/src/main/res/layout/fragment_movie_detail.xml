@@ -193,5 +193,6 @@
         android:layout_height="match_parent"
         android:id="@+id/no_movie_info"
         android:text="@string/no_movie_info"
+        android:gravity="center_horizontal|center_vertical"
         android:visibility="gone"/>
 </RelativeLayout>

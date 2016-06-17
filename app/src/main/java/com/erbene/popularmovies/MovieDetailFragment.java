@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.erbene.popularmovies.adapters.ReviewListAdapter;
@@ -26,6 +27,8 @@ import com.erbene.popularmovies.models.Movie;
 import com.erbene.popularmovies.models.Review;
 import com.erbene.popularmovies.models.Video;
 import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -69,10 +72,15 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_movie_detail, container, false);
-        mMovie = getArguments().getParcelable("movie");
-        if(mMovie == null){
-
+        //If there are no arguments just show no movie info.
+        if(getArguments() == null){
+            ScrollView sv = (ScrollView) view.findViewById(R.id.scroll_wrapper);
+            sv.setVisibility(View.GONE);
+            TextView tv = (TextView) view.findViewById(R.id.no_movie_info);
+            tv.setVisibility(View.VISIBLE);
+            return view;
         }
+        mMovie = getArguments().getParcelable("movie");
         mVideoListAdapter = new VideoListAdapter(getContext(),this,mMovie.getId());
         mReviewListAdapter = new ReviewListAdapter(getContext(),this,mMovie.getId());
         checkIfFavorite();

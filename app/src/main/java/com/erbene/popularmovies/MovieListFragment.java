@@ -43,6 +43,7 @@ public class MovieListFragment extends Fragment implements MovieListAdapter.Call
     private RecyclerView mRecyclerView;
     private MovieListAdapter mAdapter;
     private GridLayoutManager mLayoutManager;
+    private boolean mTwoPane = false;
 
     public MovieListFragment() {
 
@@ -129,8 +130,13 @@ public class MovieListFragment extends Fragment implements MovieListAdapter.Call
         parcel.putParcelable("movie",movie);
         MovieDetailFragment details = new MovieDetailFragment();
         details.setArguments(parcel);
-        getFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .add(R.id.fragment_movie_list, details).addToBackStack(null).commit();
+        if(mTwoPane){
+            getFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .replace(R.id.movie_detail_container, details,MainActivity.MOVIEDETAILFRAGMENT_TAG).commit();
+        } else {
+            getFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .add(R.id.fragment_movie_list, details).addToBackStack(null).commit();
+        }
     }
 
     @Override
@@ -211,5 +217,8 @@ public class MovieListFragment extends Fragment implements MovieListAdapter.Call
                 break;
         }
         return true;
+    }
+    public void setTwoPaneLayout(boolean isTwoPane){
+        mTwoPane = isTwoPane;
     }
 }
