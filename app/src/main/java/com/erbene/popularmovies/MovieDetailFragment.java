@@ -18,12 +18,16 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.erbene.popularmovies.adapters.ReviewListAdapter;
 import com.erbene.popularmovies.adapters.VideoListAdapter;
 import com.erbene.popularmovies.data.MovieColumns;
 import com.erbene.popularmovies.data.MovieProvider;
 import com.erbene.popularmovies.models.Movie;
+import com.erbene.popularmovies.models.Review;
 import com.erbene.popularmovies.models.Video;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 
 /**
@@ -31,14 +35,19 @@ import com.squareup.picasso.Picasso;
 
  * create an instance of this fragment.
  */
-public class MovieDetailFragment extends Fragment implements View.OnClickListener, VideoListAdapter.Callbacks {
+public class MovieDetailFragment extends Fragment implements View.OnClickListener, VideoListAdapter.Callbacks, ReviewListAdapter.Callbacks {
 
     private Movie mMovie;
     public static final String TAG ="MovieDetailFragment";
     private Button mFavoriteButton;
     private VideoListAdapter mVideoListAdapter;
     private RecyclerView mVideoListView;
-    private LinearLayoutManager mLayoutManager;
+    private ReviewListAdapter mReviewListAdapter;
+    private RecyclerView mReviewListView;
+    private LinearLayoutManager mVideoLayoutManager;
+    private LinearLayoutManager mReviewLayoutManager;
+    private TextView mNoVideos;
+    private TextView mNoReviews;
 
     public MovieDetailFragment() {
         // Required empty public constructor
@@ -61,7 +70,11 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_movie_detail, container, false);
         mMovie = getArguments().getParcelable("movie");
+        if(mMovie == null){
+
+        }
         mVideoListAdapter = new VideoListAdapter(getContext(),this,mMovie.getId());
+        mReviewListAdapter = new ReviewListAdapter(getContext(),this,mMovie.getId());
         checkIfFavorite();
         TextView textView = (TextView) view.findViewById(R.id.original_title);
         textView.setText(mMovie.getOriginalTitle());
@@ -74,10 +87,19 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
         mFavoriteButton.setOnClickListener(this);
         Picasso.with(getContext()).load(mMovie.getPosterPath())
                 .into((ImageView) view.findViewById(R.id.poster_detail));
+
         mVideoListView = (RecyclerView) view.findViewById(R.id.videos_list_view);
-        mLayoutManager = new LinearLayoutManager(getContext());
-        mVideoListView.setLayoutManager(mLayoutManager);
+        mVideoLayoutManager = new LinearLayoutManager(getContext());
+        mVideoListView.setLayoutManager(mVideoLayoutManager);
         mVideoListView.setAdapter(mVideoListAdapter);
+
+        mReviewListView = (RecyclerView) view.findViewById(R.id.reviews_list_view);
+        mReviewLayoutManager = new LinearLayoutManager(getContext());
+        mReviewListView.setLayoutManager(mReviewLayoutManager);
+        mReviewListView.setAdapter(mReviewListAdapter);
+
+        mNoReviews = (TextView) view.findViewById(R.id.no_reviews_text);
+        mNoVideos = (TextView) view.findViewById(R.id.no_videos_text);
         return view;
     }
 
@@ -134,5 +156,15 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
     @Override
     public void onClick(Video video) {
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" +video.getKey())));
+    }
+
+    @Override
+    public void onVideosRetrieved(List<Video> videos) {
+        if(videos.size() == 0) mNoVideos.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onReviewsRetrieved(List<Review> reviews) {
+        if(reviews.size() == 0) mNoReviews.setVisibility(View.VISIBLE);
     }
 }

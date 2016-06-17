@@ -32,19 +32,19 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * Created by Maia on 6/15/2016.
  */
-public class VideoListAdapter  extends RecyclerView.Adapter<VideoListAdapter.ViewHolder> implements Callback<VideoResponse> {
+public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.ViewHolder> implements Callback<VideoResponse> {
     private final String TAG = "VideoListAdapter";
 
     public List<Video> mVideoList;
     Context mContext;
-    Callbacks mCallbackReceiver;
+    Callbacks mListener;
     MovieDbApiInterface mMovieDbService;
     Long mMovieId;
 
 
     public VideoListAdapter(Context context, Callbacks cb, Long movieId){
         mContext = context;
-        mCallbackReceiver = cb;
+        mListener = cb;
         mVideoList = new ArrayList<>();
         mMovieId = movieId;
         Retrofit retrofit = new Retrofit.Builder()
@@ -71,7 +71,7 @@ public class VideoListAdapter  extends RecyclerView.Adapter<VideoListAdapter.Vie
         holder.mIconView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCallbackReceiver.onClick(mVideo);
+                mListener.onClick(mVideo);
             }
         });
         holder.mVideoName.setText(temp.getName());
@@ -99,6 +99,7 @@ public class VideoListAdapter  extends RecyclerView.Adapter<VideoListAdapter.Vie
 
     public interface Callbacks {
         public void onClick(Video video);
+        public void onVideosRetrieved(List<Video> videos);
     }
 
     @Override
@@ -110,6 +111,7 @@ public class VideoListAdapter  extends RecyclerView.Adapter<VideoListAdapter.Vie
     public void onResponse(Call<VideoResponse> call, Response<VideoResponse> response) {
         VideoResponse vResponse = response.body();
         mVideoList = vResponse.getVideos();
+        mListener.onVideosRetrieved(mVideoList);
         notifyDataSetChanged();
     }
 }

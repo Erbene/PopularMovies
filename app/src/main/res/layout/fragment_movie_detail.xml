@@ -6,7 +6,8 @@
     android:background="#ffffff">
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:id="@+id/scroll_wrapper">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -113,13 +114,70 @@
                     android:layout_below="@+id/overview"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="10dp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@+id/videos_title"
+                    android:id="@+id/video_line"
+                    android:background="@android:color/black" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:visibility="gone"
+                    android:id="@+id/no_videos_text"
+                    android:layout_below="@+id/video_line"
+                    android:gravity="center_horizontal"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/no_videos"/>
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/videos_title"
+                    android:layout_below="@+id/video_line"
+                    android:id="@+id/recycler_view_videos"
                     >
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/videos_list_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="vertical"
+                        />
+                </RelativeLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/reviews"
+                    android:id="@+id/reviews_title"
+                    android:layout_below="@+id/recycler_view_videos"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="10dp" />
+                    android:layout_marginBottom="10dp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@+id/reviews_title"
+                    android:id="@+id/line"
+                    android:background="@android:color/black" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:visibility="gone"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:id="@+id/no_reviews_text"
+                    android:layout_below="@+id/line"
+                    android:gravity="center_horizontal"
+                    android:text="@string/no_reviews"/>
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/line"
+                    android:id="@+id/reviews_layout"
+                    >
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/reviews_list_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:scrollbars="vertical"
@@ -130,4 +188,10 @@
 
         </RelativeLayout>
     </ScrollView>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/no_movie_info"
+        android:text="@string/no_movie_info"
+        android:visibility="gone"/>
 </RelativeLayout>
