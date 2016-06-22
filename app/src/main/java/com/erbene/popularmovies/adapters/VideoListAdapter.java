@@ -39,10 +39,10 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.View
     Context mContext;
     Callbacks mListener;
     MovieDbApiInterface mMovieDbService;
-    Long mMovieId;
+    long mMovieId;
 
 
-    public VideoListAdapter(Context context, Callbacks cb, Long movieId){
+    public VideoListAdapter(Context context, Callbacks cb, long movieId){
         mContext = context;
         mListener = cb;
         mVideoList = new ArrayList<>();
@@ -93,7 +93,8 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.View
     }
 
     public void retrieveVideos(){
-        Call<VideoResponse>  call = mMovieDbService.getVideos(mMovieId.toString(),BuildConfig.THE_MOVIE_DB_API_KEY);
+        Log.i("Videos", "Movie "+mMovieId);
+        Call<VideoResponse>  call = mMovieDbService.getVideos(String.valueOf(mMovieId),BuildConfig.THE_MOVIE_DB_API_KEY);
         call.enqueue(this);
     }
 

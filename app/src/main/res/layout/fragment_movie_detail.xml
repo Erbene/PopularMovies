@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.erbene.popularmovies.MovieDetailFragment"
+    android:id="@+id/movie_detail_fragment"
     android:background="#ffffff">
     <ScrollView
         android:layout_width="match_parent"

@@ -25,6 +25,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.erbene.popularmovies.adapters.MovieListAdapter;
 import com.erbene.popularmovies.data.GetMoviesTask;
@@ -43,6 +45,7 @@ public class MovieListFragment extends Fragment implements MovieListAdapter.Call
     private RecyclerView mRecyclerView;
     private MovieListAdapter mAdapter;
     private GridLayoutManager mLayoutManager;
+    private TextView mNoData;
     private boolean mTwoPane = false;
 
     public MovieListFragment() {
@@ -71,16 +74,24 @@ public class MovieListFragment extends Fragment implements MovieListAdapter.Call
         Cursor c = null;
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String mPrefOrder = sharedPref.getString(SettingsActivity.KEY_ORDER_BY, "");
-        if(mPrefOrder.equals(getResources().getString(R.string.pref_order_top_rated))){
+        boolean mShowFavorites = sharedPref.getBoolean(SettingsActivity.KEY_FAVORITE, false);
+
+        if (mShowFavorites) {
+            c = getActivity().getContentResolver().query(MovieProvider.FavoriteMovies.CONTENT_URI, null, null, null, null);
+        } else if(mPrefOrder.equals(getResources().getString(R.string.pref_order_top_rated))){
             c = getActivity().getContentResolver().query(MovieProvider.TopRatedMovies.CONTENT_URI, null, null, null, null);
         } else if (mPrefOrder.equals(getResources().getString(R.string.pref_order_popularity))){
             c = getActivity().getContentResolver().query(MovieProvider.PopularityMovies.CONTENT_URI, null, null, null, null);
         }
 
-        if (c == null || c.getCount() == 0){
+        if (!mShowFavorites && (c == null || c.getCount() == 0)){
             GetMoviesTask loadMoviesTask = new GetMoviesTask(this, getContext());
             loadMoviesTask.execute();
+        } else if(c != null && c.getCount() == 0){
+            mNoData.setText(getResources().getString(R.string.no_favorites));
+            mNoData.setVisibility(View.VISIBLE);
         }
+
 
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
         super.onActivityCreated(savedInstanceState);
@@ -97,6 +108,8 @@ public class MovieListFragment extends Fragment implements MovieListAdapter.Call
 
         mAdapter = new MovieListAdapter(getContext(),this,null);
         mRecyclerView.setAdapter(mAdapter);
+
+        mNoData = (TextView) mView.findViewById(R.id.no_data);
 
         return mView;
     }
@@ -128,14 +141,15 @@ public class MovieListFragment extends Fragment implements MovieListAdapter.Call
         Log.i("MovieList","OnClickEvent");
         Bundle parcel = new Bundle();
         parcel.putParcelable("movie",movie);
-        MovieDetailFragment details = new MovieDetailFragment();
-        details.setArguments(parcel);
         if(mTwoPane){
+            MovieDetailFragment details = new MovieDetailFragment();
+            details.setArguments(parcel);
             getFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                     .replace(R.id.movie_detail_container, details,MainActivity.MOVIEDETAILFRAGMENT_TAG).commit();
         } else {
-            getFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .add(R.id.fragment_movie_list, details).addToBackStack(null).commit();
+            Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
+            intent.putExtra(Movie.MOVIE_URI,movie);
+            getActivity().startActivity(intent);
         }
     }
 
@@ -150,6 +164,14 @@ public class MovieListFragment extends Fragment implements MovieListAdapter.Call
         } else if (mPrefOrder.equals(getResources().getString(R.string.pref_order_top_rated))){
             destination = MovieProvider.TopRatedMovies.CONTENT_URI;
         }
+        if (movies == null) {
+            mNoData.setText(getResources().getString(R.string.no_movies));
+            mNoData.setVisibility(View.VISIBLE);
+            return;
+        } else {
+            mNoData.setVisibility(View.GONE);
+        }
+
         for (Movie movie : movies){
             ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
                     destination);
@@ -173,8 +195,15 @@ public class MovieListFragment extends Fragment implements MovieListAdapter.Call
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String mPrefOrder = sharedPref.getString(SettingsActivity.KEY_ORDER_BY, "");
+        boolean mShowFavorites = sharedPref.getBoolean(SettingsActivity.KEY_FAVORITE, false);
         CursorLoader cursor = null;
-        if(mPrefOrder.equals(getResources().getString(R.string.pref_order_top_rated))){
+        if(mShowFavorites){
+            cursor = new CursorLoader(getActivity(), MovieProvider.FavoriteMovies.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null);
+        } else if(mPrefOrder.equals(getResources().getString(R.string.pref_order_top_rated))){
             cursor = new CursorLoader(getActivity(), MovieProvider.TopRatedMovies.CONTENT_URI,
                     null,
                     null,
@@ -193,6 +222,18 @@ public class MovieListFragment extends Fragment implements MovieListAdapter.Call
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        boolean mShowFavorites = sharedPref.getBoolean(SettingsActivity.KEY_FAVORITE, false);
+        if(data.getCount() == 0){
+            if(mShowFavorites){
+                mNoData.setText(getResources().getString(R.string.no_favorites));
+            } else {
+                mNoData.setText(getResources().getString(R.string.no_movies));
+            }
+            mNoData.setVisibility(View.VISIBLE);
+        } else {
+            mNoData.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -208,12 +249,12 @@ public class MovieListFragment extends Fragment implements MovieListAdapter.Call
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.favorites:
-                FragmentTransaction fTransaction = getFragmentManager().beginTransaction();
-                Fragment fragment = getFragmentManager().findFragmentByTag(FavoritesFragment.TAG);
-                if (fragment == null) {
-                    fTransaction.add(R.id.fragment_movie_list, new FavoritesFragment(), FavoritesFragment.TAG);
-                    fTransaction.addToBackStack(null).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).commit();
-                }
+                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                boolean mShowFavorites = sharedPref.getBoolean(SettingsActivity.KEY_FAVORITE, false);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean(SettingsActivity.KEY_FAVORITE,!mShowFavorites);
+                editor.commit();
+                restartLoader();
                 break;
         }
         return true;

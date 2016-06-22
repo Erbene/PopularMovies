@@ -17,7 +17,7 @@ public class SettingsActivity extends Activity {
 
     private final static String TAG = "SettingsActivity";
     public final static String KEY_ORDER_BY = "pref_order_key";
-
+    public final static String KEY_FAVORITE = "pref_favorite";
     public SettingsActivity() {}
 
     @Override

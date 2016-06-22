@@ -16,12 +16,13 @@ import java.util.List;
  * Created by Maia on 5/30/2016.
  */
 public class Movie implements Parcelable {
+    public static final String MOVIE_URI = "movie";
     String mPosterPath;
     boolean mAdult;
     String mOverview;
     String mReleaseDate;
     List<Integer> mGenderList;
-    Long mId;
+    long mId;
     String mOriginalTitle;
     String mOriginalLanguage;
     String mTitle;
@@ -41,7 +42,7 @@ public class Movie implements Parcelable {
     public Movie(JSONObject json){
         try {
             Log.i("Movie","Movie created: "+json.getString("original_title") );
-            setId(json.getLong("id"));
+            setId(json.getInt("id"));
             setOriginalTitle(json.getString("original_title"));
             setPosterPath(json.getString("poster_path"));
             setOverview(json.getString("overview"));
@@ -53,7 +54,7 @@ public class Movie implements Parcelable {
     }
     public Movie(Cursor cursor, boolean favorite){
         try {
-            setId(new Long(cursor.getInt(cursor.getColumnIndex(MovieColumns._ID))));
+            setId(new Integer(cursor.getInt(cursor.getColumnIndex(MovieColumns._ID))));
             setOriginalTitle(cursor.getString(cursor.getColumnIndex(MovieColumns.ORIGINAL_TITLE)));
             setPosterPath(cursor.getString(cursor.getColumnIndex(MovieColumns.POSTER_PATH)));
             setOverview(cursor.getString(cursor.getColumnIndex(MovieColumns.OVERVIEW)));
@@ -70,6 +71,7 @@ public class Movie implements Parcelable {
         setOverview(pc.readString());
         setReleaseDate(pc.readString());
         setVoteAverage(pc.readDouble());
+        setId(pc.readLong());
     }
 
     @Override
@@ -84,6 +86,7 @@ public class Movie implements Parcelable {
         dest.writeString(getOverview());
         dest.writeString(getReleaseDate());
         dest.writeDouble(getVoteAverage());
+        dest.writeLong(getId());
     }
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
         public Movie createFromParcel(Parcel pc) {
@@ -101,14 +104,11 @@ public class Movie implements Parcelable {
 
         Movie movie = (Movie) o;
 
-        return mId.equals(movie.mId);
+        return mId == (movie.mId);
 
     }
 
-    @Override
-    public int hashCode() {
-        return mId.hashCode();
-    }
+
 
     public String getPosterPath() {
         return mPosterPath;
@@ -158,11 +158,11 @@ public class Movie implements Parcelable {
         this.mOriginalLanguage = mOriginalLanguage;
     }
 
-    public Long getId() {
+    public long getId() {
         return mId;
     }
 
-    public void setId(Long mId) {
+    public void setId(long mId) {
         this.mId = mId;
     }
 

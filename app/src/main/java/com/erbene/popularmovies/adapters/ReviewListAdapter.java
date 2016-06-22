@@ -31,11 +31,11 @@ public class ReviewListAdapter extends RecyclerView.Adapter<ReviewListAdapter.Vi
     public List<Review> mReviewList;
     Context mContext;
     MovieDbApiInterface mMovieDbService;
-    Long mMovieId;
+    long mMovieId;
     Callbacks mListener;
 
 
-    public ReviewListAdapter(Context context,Callbacks cb, Long movieId){
+    public ReviewListAdapter(Context context,Callbacks cb, long movieId){
         mContext = context;
         mReviewList = new ArrayList<>();
         mMovieId = movieId;
@@ -78,7 +78,7 @@ public class ReviewListAdapter extends RecyclerView.Adapter<ReviewListAdapter.Vi
     }
 
     public void retrieveReviews(){
-        Call<ReviewResponse> call = mMovieDbService.getReviews(mMovieId.toString(), BuildConfig.THE_MOVIE_DB_API_KEY);
+        Call<ReviewResponse> call = mMovieDbService.getReviews(String.valueOf(mMovieId), BuildConfig.THE_MOVIE_DB_API_KEY);
         call.enqueue(this);
     }
 

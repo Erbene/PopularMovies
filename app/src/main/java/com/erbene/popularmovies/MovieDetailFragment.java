@@ -3,6 +3,7 @@ package com.erbene.popularmovies;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -59,13 +60,7 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(savedInstanceState == null || !savedInstanceState.containsKey("movie")) {
-            getActivity().getFragmentManager().popBackStack();
-        }
-        else {
-            mMovie = savedInstanceState.getParcelable("movie");
-        }
-
+        Log.i("sdfs","sdfs");
     }
 
     @Override
@@ -80,7 +75,9 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
             tv.setVisibility(View.VISIBLE);
             return view;
         }
-        mMovie = getArguments().getParcelable("movie");
+
+        mMovie = getArguments().getParcelable(Movie.MOVIE_URI);
+
         mVideoListAdapter = new VideoListAdapter(getContext(),this,mMovie.getId());
         mReviewListAdapter = new ReviewListAdapter(getContext(),this,mMovie.getId());
         checkIfFavorite();
